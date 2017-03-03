@@ -16,7 +16,7 @@
  *
  * > Supports assignment, copy, concatenation, and streams.
  */
-template<size_t SIZE>
+template<size_t SIZE, typename CHAR = char>
 class fstring {
 public:
     fstring()
@@ -24,13 +24,13 @@ public:
     {
     }
 
-    fstring(const char* s, size_t l)
+    fstring(const CHAR* s, size_t l)
         : size_(0), sizeDirty_(false)
     {
         copy(s, l);
     }
 
-    fstring(const char* s)
+    fstring(const CHAR* s)
         : size_(0), sizeDirty_(false)
     {
         copy(s, maxlen());
@@ -68,12 +68,12 @@ public:
         return size();
     }
 
-    inline const char* c_str() const
+    inline const CHAR* c_str() const
     {
         return buf_;
     }
 
-    fstring<SIZE>& operator =(const char* str)
+    fstring<SIZE>& operator =(const CHAR* str)
     {
         size_ = 0;
         copy(str, maxlen());
@@ -94,18 +94,18 @@ public:
         copy(str.c_str(), maxlen());
     }
 
-    void operator +=(const char* str)
+    void operator +=(const CHAR* str)
     {
         copy(str, maxlen());
     }
 
-    char& operator [](size_t n)
+    CHAR& operator [](size_t n)
     {
         sizeDirty_ = true;
         return buf_[n];
     }
 
-    inline const char operator [](size_t n) const
+    inline const CHAR operator [](size_t n) const
     {
         return buf_[n];
     }
@@ -120,7 +120,7 @@ public:
         return std::move(ret);
     }
 
-    inline bool operator==(const char* s) const
+    inline bool operator==(const CHAR * s) const
     {
         // Cannot mutate the size -- so we're just going to do an unsafe compare
         // as our buffer will always be NUL-terminated.
@@ -141,17 +141,12 @@ public:
 private:
     size_t size_;
     bool sizeDirty_;
-    char buf_[SIZE + 1];
+    CHAR buf_[SIZE + 1];
 
-    template<size_t N>
-    friend std::ostream& operator <<(std::ostream& os, const fstring<N>& fs);
+    template<size_t N, typename C>
+    friend std::basic_ostream<C>& operator <<(std::basic_ostream<C>& os, const fstring<N, C>& fs);
 
-    size_t lazySize() const
-    {
-        return strlen(c_str());
-    }
-
-    void copy(const char* s, size_t maxlen)
+    void copy(const CHAR* s, size_t maxlen)
     {
         for (; *s && size_ < maxlen; s++, size_++)
         {
@@ -162,8 +157,8 @@ private:
     }
 };
 
-template<size_t SIZE>
-std::ostream& operator <<(std::ostream& os, const fstring<SIZE>& fs)
+template<size_t SIZE, typename CHAR>
+std::basic_ostream<CHAR>& operator <<(std::basic_ostream<CHAR>& os, const fstring<SIZE, CHAR>& fs)
 {
     return os << fs.c_str();
 }

@@ -1,5 +1,6 @@
 
 #include "fstring.hpp"
+#include <cwchar>
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -8,6 +9,7 @@
 
 using std::string;
 using std::cout;
+using std::wcout;
 using std::endl;
 
 TEST_CASE("Cannot append to a zero-sized buffer") {
@@ -51,4 +53,15 @@ TEST_CASE("Concat of larger and smaller string") {
 
     REQUIRE(d.size() == e.size());
     REQUIRE(d.size() == (a.size() + 2));
+}
+
+TEST_CASE("Supports wchar_t") {
+    fstring<64, wchar_t> wide;
+
+    wchar_t wcs[] = L"This is a simple string";
+    wide += wcs;
+
+    REQUIRE(wcscmp(wide.c_str(), wcs) == 0);
+
+    wcout << wide << endl;
 }
