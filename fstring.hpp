@@ -73,15 +73,25 @@ public:
         return buf_;
     }
 
-    const fstring<SIZE>& operator =(const char* str)
+    fstring<SIZE>& operator =(const char* str)
     {
         size_ = 0;
         copy(str, maxlen());
+
+        return *this;
     }
 
-    void operator +=(fstring& str)
+    template<size_t N>
+    fstring<SIZE>& operator =(const fstring<N>& str)
     {
-        copy(str.c_str(), str.length());
+        size_ = 0;
+        copy(str.c_str(), maxlen());
+    }
+
+    template<size_t N>
+    void operator +=(fstring<N>& str)
+    {
+        copy(str.c_str(), maxlen());
     }
 
     void operator +=(const char* str)
@@ -100,24 +110,41 @@ public:
         return buf_[n];
     }
 
-    inline fstring<SIZE>&& operator +(const fstring& rhs) const
+    template<size_t N>
+    inline fstring<SIZE>&& operator +(const fstring<N>& rhs) const
     {
         fstring<SIZE> ret;
         ret.copy(c_str(), maxlen());
-        ret.copy(rhs.c_str(), rhs.maxlen());
+        ret.copy(rhs.c_str(), maxlen());
 
         return std::move(ret);
     }
 
-    inline bool operator==(const char* 
+    inline bool operator==(const char* s) const
+    {
+        // Cannot mutate the size -- so we're just going to do an unsafe compare
+        // as our buffer will always be NUL-terminated.
+        return strcmp(c_str(), s) == 0;
+    }
+
+    inline bool operator==(const std::string& s) const
+    {
+        return strcmp(c_str(), s.c_str()) == 0;
+    }
+
+    template<size_t N>
+    inline bool operator==(const fstring<N>& s) const
+    {
+        return strcmp(c_str(), s.c_str()) == 0;
+    }
 
 private:
     size_t size_;
     bool sizeDirty_;
     char buf_[SIZE + 1];
 
-    template<size_t SIZE_OS>
-    friend std::ostream& operator <<(std::ostream& os, const fstring<SIZE_OS>& fs);
+    template<size_t N>
+    friend std::ostream& operator <<(std::ostream& os, const fstring<N>& fs);
 
     size_t lazySize() const
     {

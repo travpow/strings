@@ -16,9 +16,9 @@ $(TARGET):
 .PHONY: test
 
 clean:
-	rm $(TARGET)
+	rm $(TARGET) || true;
 
-test: $(CATCH) $(TARGET)
+test: clean $(CATCH) $(TARGET)
 
 all: test
 	@echo "success"
