@@ -58,11 +58,6 @@ public:
         return size_;
     }
 
-    inline const size_t size() const
-    {
-        return strlen(size_);
-    }
-
     inline const size_t length()
     {
         return size();
