@@ -9,3 +9,6 @@
 
 # Dependencies
 Catch/
+
+# Target
+bin/**

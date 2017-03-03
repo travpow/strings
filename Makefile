@@ -8,17 +8,21 @@ SRCS = \
 
 CATCH = Catch/include/catch.hpp
 DIR = $(shell pwd)
+BIN = bin/
 
 $(CATCH):
 	git clone https://github.com/philsquared/Catch.git
 
-$(TARGET):
-	@g++ -g -o $(TARGET) -I $(DIR) -std=c++11 $(SRCS) ; $(TARGET)
+$(BIN):
+	@mkdir $(BIN)
+
+$(TARGET): $(BIN)
+	@g++ -g -o $(BIN)/$(TARGET) -I $(DIR) -std=c++11 $(SRCS) ; $(BIN)/$(TARGET)
 
 .PHONY: test
 
 clean:
-	@rm $(TARGET) || true;
+	@rm -r $(DIR)/$(BIN) || true ;
 
 test: clean $(CATCH) $(TARGET)
 
