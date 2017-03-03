@@ -1,0 +1,6 @@
+
+*.dSYM
+*.swp
+*/**/.swp
+
+Catch/
